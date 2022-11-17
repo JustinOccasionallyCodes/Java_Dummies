@@ -1,0 +1,14 @@
+echo "# Java_Dummies" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/JustinOccasionallyCodes/Java_Dummies.git
+git push -u origin main
+
+============================================================================
+
+//ACP
+git add .
+git commit -m "React_project"
+git push -u origin main
