@@ -1,0 +1,109 @@
+package com.example.demo;
+
+
+import java.sql.*;
+import java.text.NumberFormat;
+
+public class ListMovies {
+    public static void main(String[] args) {
+        // Create a NumberFormat instance for formatting currency
+        NumberFormat cf = NumberFormat.getCurrencyInstance();
+
+        // Retrieve the movies from the database
+        ResultSet movies = getMovies();
+        try {
+            // Iterate over the movie records
+            while (movies.next()) {
+                // Create a Movie object from the current movie record
+                Movie m = getMovie(movies);
+
+                // Construct a message with the movie details
+                String msg = Integer.toString(m.year);
+                msg += ": " + m.title;
+                msg += " (" + cf.format(m.price) + ")";
+
+                // Print the movie details
+                System.out.println(msg);
+            }
+        } catch (SQLException e) {
+            // Handle any SQL exception that occurs during processing
+            System.out.println(e.getMessage());
+        }
+    }
+
+    // Method to retrieve movies from the database and return a ResultSet
+    private static ResultSet getMovies() {
+        // Establish a database connection
+        Connection con = getConnection();
+        try {
+            // Create a statement and execute a select query to retrieve movies
+            Statement s = con.createStatement();
+            String select = "SELECT title, year, price " +
+                            "FROM movie ORDER BY year";
+            ResultSet rows = s.executeQuery(select);
+            return rows;
+        } catch (SQLException e) {
+            // Handle any SQL exception that occurs during processing
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+
+    // Method to establish a database connection and return a Connection object
+    private static Connection getConnection() {
+        Connection con = null;
+        try {
+            // Load the JDBC driver for MySQL
+            Class.forName("com.mysql.jdbc.Driver");
+
+            // Create the database connection URL, username, and password
+            String url = "jdbc:mysql://localhost/Movies";
+            String user = "root";
+            String pw = "PassWord";
+
+            // Establish a connection to the database
+            con = DriverManager.getConnection(url, user, pw);
+        } catch (ClassNotFoundException e) {
+            // Handle any exception related to the JDBC driver
+            System.out.println(e.getMessage());
+            System.out.println("11");
+            System.exit(0);
+        } catch (SQLException e) {
+            // Handle any SQL exception that occurs during processing
+            System.out.println(e.getMessage());
+            System.out.println("22");
+            System.exit(0);
+        }
+        return con;
+    }
+
+    // Method to create a Movie object from a ResultSet
+    private static Movie getMovie(ResultSet movies) {
+        try {
+            // Extract the movie details from the ResultSet
+            String title = movies.getString("Title");
+            int year = movies.getInt("Year");
+            double price = movies.getDouble("Price");
+
+            // Create a Movie object with the extracted details and return it
+            return new Movie(title, year, price);
+        } catch (SQLException e) {
+            // Handle any SQL exception that occurs during processing
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+
+    // Inner class representing a Movie object
+    private static class Movie {
+        public String title;
+        public int year;
+        public double price;
+
+        public Movie(String title, int year, double price) {
+            this.title = title;
+            this.year = year;
+            this.price = price;
+        }
+    }
+}
